@@ -22,12 +22,17 @@ let plugins = [
         }
       },
       { from: './src/icons', to: 'icons' },
-      {
-        from: './src/ui', to: 'ui',
+      { from: './src/ui-new', to: 'ui-new',
         globOptions: {
-          ignore: ['**/code/*', '**/*.zip']
+          ignore: ['**/*.ts']
         }
-      }
+      },
+      // {
+      //   from: './src/ui', to: 'ui',
+      //   globOptions: {
+      //     ignore: ['**/code/*', '**/*.zip']
+      //   }
+      // }
     ]
   })
 ];
@@ -47,9 +52,10 @@ module.exports = function (args) {
 
   let codeEntries = {
     'core': [],
-    'ui/code/popup': ['./src/ui/code/popup.ts', `./src/core/browsers/${browserType}.ts`],
-    'ui/code/proxyable': ['./src/ui/code/proxyable.ts', `./src/core/browsers/${browserType}.ts`],
-    'ui/code/settingsPage': ['./src/ui/code/settingsPage.ts', `./src/core/browsers/${browserType}.ts`],
+    'ui-new/popup/index': './src/ui-new/popup/index.ts',
+    // 'ui/code/popup': ['./src/ui/code/popup.ts', `./src/core/browsers/${browserType}.ts`],
+    // 'ui/code/proxyable': ['./src/ui/code/proxyable.ts', `./src/core/browsers/${browserType}.ts`],
+    // 'ui/code/settingsPage': ['./src/ui/code/settingsPage.ts', `./src/core/browsers/${browserType}.ts`],
   };
   if (coreIsServiceWorker) {
     codeEntries["core"] = [`./src/core/browsers/${browserType}.ts`, './src/core/ServiceWorker/CoreServiceWorker.ts']

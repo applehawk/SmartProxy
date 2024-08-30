@@ -1,5 +1,5 @@
 ﻿import { Settings } from './Settings';
-import { api, environment } from '../lib/environment';
+import { api } from '../lib/environment';
 import { Utils } from '../lib/Utils';
 import { ProfileOperations } from './ProfileOperations';
 
@@ -344,9 +344,9 @@ export class SettingsConfig implements Cloneable {
 	public syncHash: string = '';
 	public proxyProfiles: SmartProfile[] = getBuiltinSmartProfiles();
 	public activeProfileId: string = SmartProfileTypeBuiltinIds.SmartRules;
-	public defaultProxyServerId: string = getOurProxyServer().id;
+	public defaultProxyServerId: string;
 
-	public proxyServers: ProxyServer[] = [getOurProxyServer()];
+	public proxyServers: ProxyServer[] = [];
 	public proxyServerSubscriptions: ProxyServerSubscription[] = [];
 	public options: GeneralOptions;
 	public firstEverInstallNotified: boolean = false;
@@ -393,13 +393,31 @@ export class SettingsConfig implements Cloneable {
 		this.configVersion = source.configVersion;
 	}
 }
-export function getOurProxyServer() {
+
+
+const ourProxyServers = [
+	["38.180.124.10", 30863],
+] as const;
+
+// Keep in mind that the backgrouns script shuts down sometimes,
+// so this runs not just on first browser launch, but possibly more often.
+// Also keep in mind that if we ever introduce multiple scripts, this will be
+// returning a different server for each script.
+//
+// TODO make sure floating point error can't mess this up.
+// Though worst-case scenario is that the user will just restart the browser.
+const randomServerInd = Math.floor(ourProxyServers.length * Math.random());
+
+/**
+ * The server is picked upon script execution - not on every function call
+ */
+export function getOurRandomProxyServer() {
 	const ourProxyServer = new ProxyServer();
 
 	ourProxyServer.name = "Our default server";
 	ourProxyServer.id = ourProxyServer.name;
-	ourProxyServer.host = "194.60.134.221";
-	ourProxyServer.port = 46750;
+	ourProxyServer.host =ourProxyServers[randomServerInd][0];
+	ourProxyServer.port = ourProxyServers[randomServerInd][1];
 	ourProxyServer.protocol = "SOCKS5";
 	ourProxyServer.username = "";
 	ourProxyServer.password = "";
@@ -590,7 +608,14 @@ function getOurProxyRules() {
 	googlevideoRule.hostName = "googlevideo.com";
 	youtubeRule.ruleSearch = "googlevideo.com";
 
-	return [youtubeRule, googlevideoRule];
+		// Thumbnails (and other stuff).
+	// Reviews on Chrome Web Store say that they are also throttled.
+	const ytimgRule = new ProxyRule();
+	ytimgRule.CopyFrom(youtubeRule);
+	googlevideoRule.hostName = "ytimg.com";
+	youtubeRule.ruleSearch = "ytimg.com";
+
+	return [youtubeRule, googlevideoRule, ytimgRule];
 }
 
 export function getSmartProfileTypeDefaultId(profileType: SmartProfileType) {
@@ -627,15 +652,15 @@ export class GeneralOptions implements Cloneable, Comparable {
 	public syncSettings: boolean = false;
 	public syncActiveProfile: boolean = true;
 	public syncActiveProxy: boolean = true;
-	public detectRequestFailures: boolean = true;
-	public displayFailedOnBadge: boolean = true;
-	public displayAppliedProxyOnBadge: boolean = environment.initialConfig.displayTooltipOnBadge;
-	public displayMatchedRuleOnBadge: boolean = environment.initialConfig.displayTooltipOnBadge;
+	public detectRequestFailures: boolean = false;
+	public displayFailedOnBadge: boolean = false;
+	public displayAppliedProxyOnBadge: boolean = false;
+	public displayMatchedRuleOnBadge: boolean = false;
 	public refreshTabOnConfigChanges: boolean = false;
 	public proxyPerOrigin: boolean = true;
 	public activeIncognitoProfileId: string;
-	public enableShortcuts: boolean = true;
-	public shortcutNotification: boolean = true;
+	public enableShortcuts: boolean = false;
+	public shortcutNotification: boolean = false;
 	public themeType: ThemeType = ThemeType.Auto;
 	public themesLight: string;
 	public themesLightCustomUrl: string;

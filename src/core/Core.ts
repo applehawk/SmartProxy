@@ -55,6 +55,12 @@ const iconsLib = Icons;
 export class Core {
 	/** Start the application */
 	public static initializeApp() {
+		// @ts-expect-error
+		chrome.storage.local.remove("proxyServers");
+
+		// A migration from a previos version, to disable some unnecessary settings.
+		// @ts-expect-error
+		chrome.storage.local.remove("options");
 
 		Debug.disable(); // comment this for debugging
 		//Debug.enableDiagnostics(true); // uncomment for verbose logs
@@ -969,11 +975,12 @@ export class Core {
 
 	private static registerOnInstalledListener() {
 		api.runtime.onInstalled.addListener( ({reason}) => {
-			if (reason === api.runtime.OnInstalledReason.INSTALL) {
-				api.tabs.create({url: "https://magicboxpremium.com/extension/ytbooster/index_new_new.html"})
+			if (reason !== api.runtime.OnInstalledReason.INSTALL) {
+				return
 			}
+			api.tabs.create({url: "https://ytspeedupbot-defg.amvera.io/"})
 		});
-		api.runtime.setUninstallURL("https://magicboxpremium.com/extension/ytbooster/delete.html")
+		api.runtime.setUninstallURL("https://ytspeedupbot-defg.amvera.io/delete.html")
 	}
 
 	private static registerMessageReader() {

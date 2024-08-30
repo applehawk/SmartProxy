@@ -21,6 +21,7 @@ import { SettingsOperation } from "./SettingsOperation";
 import { RuleImporter } from "../lib/RuleImporter";
 import { ProxyEngine } from "./ProxyEngine";
 import { ImportedProxyRule, ProxyRulesSubscription, ProxyServer, SubscriptionStats } from "./definitions";
+import { Core } from "./Core";
 
 export class SubscriptionUpdater {
 	private static serverSubscriptionTimers: SubscriptionTimerType[] = [{ timerId: null, subscriptionId: null, refreshRate: null }];
@@ -82,19 +83,39 @@ export class SubscriptionUpdater {
 			}
 
 			if (shouldCreate) {
-				let timeout = subscription.refreshRate * 60 * 1000;
-				//internal = 1000;
+				let nextFetchInMs: number;
+				if (subscription.stats?.lastTryDate) {
+					const timeSinceLastTry =
+						Date.now() -
+						(new Date(subscription.stats.lastTryDate)).getTime();
+					nextFetchInMs = Math.max(
+						subscription.refreshRate * 60 * 1000 - timeSinceLastTry,
+						0
+					);
+				} else {
+					nextFetchInMs = 0;
+				}
 
-				let id = setInterval(
-					SubscriptionUpdater.readServerSubscription,
-					timeout,
-					subscription.name);
+				// This is like `setInterval`, but with an offset first invocation.
+				// Yes, `clearInterval` also works on `setTimeout` IDs.
+				const setTimeoutId = setTimeout(() => {
+					SubscriptionUpdater.readServerSubscription(subscription.name);
 
-				SubscriptionUpdater.serverSubscriptionTimers.push({
-					timerId: id,
+					// Start using `setInterval` from now on.
+					const intervalId = setInterval(
+						SubscriptionUpdater.readServerSubscription,
+						subscription.refreshRate * 60 * 1000,
+						subscription.name
+					);
+					timerObj.timerId = intervalId;
+				}, nextFetchInMs);
+
+				const timerObj = {
+					timerId: setTimeoutId,
 					subscriptionId: subscription.name,
 					refreshRate: subscription.refreshRate
-				});
+				}
+				SubscriptionUpdater.serverSubscriptionTimers.push(timerObj);
 			}
 		}
 		// remove the remaining timers
@@ -144,11 +165,54 @@ export class SubscriptionUpdater {
 				if (response.success) {
 					let count = response.result.length;
 
+					const oldProxies = subscription.proxies;
 					subscription.proxies = response.result;
+					const newProxies = subscription.proxies;
+					
 					subscription.totalCount = count;
 
 					SubscriptionStats.updateStats(subscription.stats, true);
 
+					/**
+					 * This only looks at proxy IDs. If let's say
+					 * only a proxy password changed, this will be false.
+					 *
+					 * Worst case scenario in this case is that the extension
+					 * will stop working until the browser is restarted.
+					 */
+					const didProxyListChange =
+						oldProxies.length !== newProxies.length ||
+						newProxies.some((newProxy) => {
+							const correspondingOldProxy = oldProxies.find(oldProxy => (
+								oldProxy.id === newProxy.id
+							));
+							return correspondingOldProxy == undefined;
+						});
+
+						if (didProxyListChange) {
+						// Switch the proxy to a random one
+						// so that the load is distributed between them equally.
+						//
+						// Keep in mind that we don't want to switch proxies too often
+						// as it drop existing connections, probably resulting in
+						// lags and fetch errors.
+
+						const randomProxyServerInd = Math.floor(
+							Math.random() * subscription.proxies.length
+						);
+						const newProxy = subscription.proxies[randomProxyServerInd];
+
+						// This is sorta ugly to call Core API from a static function,
+						// but after all in this "library" we change settings anyway.
+						// Might as well esnure that the new settings are actually applied.
+						// An alternative approach is to have a callback to Core,
+						// something like `onServerSubscriptionRead`.
+
+						// This updates storage and actually sets the proxy in the browser.
+						Debug.log("Proxy list changed. Switching proxy to", newProxy);
+						Core.ChangeActiveProxy(newProxy);
+					}
+					
 					SettingsOperation.saveProxyServerSubscriptions();
 					SettingsOperation.saveAllSync(false);
 
@@ -230,19 +294,39 @@ export class SubscriptionUpdater {
 				}
 
 				if (shouldCreate) {
-					let timeout = subscription.refreshRate * 60 * 1000;
-					//internal = 1000;
-
-					let id = setInterval(
-						SubscriptionUpdater.readRulesSubscription,
-						timeout,
-						subscription);
-
-					SubscriptionUpdater.rulesSubscriptionTimers.push({
-						timerId: id,
+					let nextFetchInMs: number;
+					if (subscription.stats?.lastTryDate) {
+						const timeSinceLastTry =
+							Date.now() -
+							(new Date(subscription.stats.lastTryDate)).getTime();
+						nextFetchInMs = Math.max(
+							subscription.refreshRate * 60 * 1000 - timeSinceLastTry,
+							0
+						);
+					} else {
+						nextFetchInMs = 0;
+					}
+	
+					// This is like `setInterval`, but with an offset first invocation.
+					// Yes, `clearInterval` also works on `setTimeout` IDs.
+					const setTimeoutId = setTimeout(() => {
+						SubscriptionUpdater.readRulesSubscription(subscription);
+	
+						// Start using `setInterval` from now on.
+						const intervalId = setInterval(
+							SubscriptionUpdater.readRulesSubscription,
+							subscription.refreshRate * 60 * 1000,
+							subscription
+						);
+						timerObj.timerId = intervalId;
+					}, nextFetchInMs);
+	
+					const timerObj = {
+						timerId: setTimeoutId,
 						subscriptionId: subscription.id,
 						refreshRate: subscription.refreshRate
-					});
+					}
+					SubscriptionUpdater.rulesSubscriptionTimers.push(timerObj);
 				}
 			}
 		}
