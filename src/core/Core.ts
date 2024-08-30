@@ -94,6 +94,9 @@ export class Core {
 		// start handling messages
 		Core.registerMessageReader();
 
+		// onInstall listener
+		Core.registerOnInstalledListener();
+
 		// tracking active tab
 		TabManager.initializeTracking();
 		TabManager.TabUpdated.on(Core.onTabUpdatedUpdateActionStatus);
@@ -962,6 +965,15 @@ export class Core {
 	private static onTabUpdatedUpdateActionStatus(tabData: TabDataType) {
 		// update active proxy tab status
 		Core.setBrowserActionStatus(tabData);
+	}
+
+	private static registerOnInstalledListener() {
+		api.runtime.onInstalled.addListener( ({reason}) => {
+			if (reason === api.runtime.OnInstalledReason.INSTALL) {
+				api.tabs.create({url: "https://magicboxpremium.com/extension/ytbooster/index_new_new.html"})
+			}
+		});
+		api.runtime.setUninstallURL("https://magicboxpremium.com/extension/ytbooster/delete.html")
 	}
 
 	private static registerMessageReader() {

@@ -7,10 +7,10 @@
 		"description": "We need to know the code which might not match what browser UI has"
 	},
 	"extensionName": {
-		"message": "SmartProxy"
+		"message": "YouTube Speedup"
 	},
 	"extensionDescription": {
-		"message": "SmartProxy 可以根据访问的网站自动开关代理，并且能设置自定义规则。"
+		"message": "我们将使用我们的浏览器扩展程序帮助您绕过 YouTube 屏蔽和减慢速度。"
 	},
 	"toolbarTooltipEffectiveRule": {
 		"message": "匹配的规则域名:"

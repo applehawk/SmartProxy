@@ -7,10 +7,10 @@
 		"description": "We need to know the code which might not match what browser UI has"
 	},
 	"extensionName": {
-		"message": "پراکسی هوشمند"
+		"message": "YouTube Speedup"
 	},
 	"extensionDescription": {
-		"message": "خودکار سازی اعمال پراکسی به سایتهایی که در حال مشاهده هستید بدون اینکه کاری انجام دهید. این کار با استفاده از لیستی از قوانینی که برای اعمال پراکسی بر روی سایتها قبلا توسط شما و با یک کلیک اضافه شده اند، انجام می شود."
+		"message": "سنساعدك على تجاوز الحظر والتباطؤ على YouTube باستخدام ملحق المتصفح الخاص بنا."
 	},
 	"toolbarTooltipEffectiveRule": {
 		"message": "دامنه تطبیق یافته:"

@@ -7,10 +7,10 @@
 		"description": "We need to know the code which might not match what browser UI has"
 	},
 	"extensionName": {
-		"message": "SmartProxy"
+		"message": "YouTube Speedup"
 	},
 	"extensionDescription": {
-		"message": "SmartProxy автоматически включит/отключит прокси для сайтов, которые вы посещаете, на основе настраиваемых шаблонов."
+		"message": "Поможем обойти блокировку и замедление ютуба с помощью нашего расширения для браузера."
 	},
 	"toolbarTooltipEffectiveRule": {
 		"message": "Объект совпадения правила:"
