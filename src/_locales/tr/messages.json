@@ -7,7 +7,7 @@
 		"description": "We need to know the code which might not match what browser UI has"
 	},
 	"extensionName": {
-		"message": "YouTube Speedup"
+		"message": "YouTube Speedup - YouTube'u hızlandırın ve video kapaklarını yükleyin."
 	},
 	"extensionDescription": {
 		"message": "YouTube Speedup, ziyaret ettiğiniz siteler için, özelleştirilebilir kalıplara dayalı olarak otomatik olarak proxy'yi etkinleştirecek / devre dışı bırakacaktır."

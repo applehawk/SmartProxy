@@ -42,7 +42,6 @@ import { api } from '../lib/environment';
 import { Utils } from '../lib/Utils';
 import { ProfileOperations } from './ProfileOperations';
 
-
 const sop = SettingsOperation;
 
 export class Settings {
@@ -161,9 +160,10 @@ export class Settings {
 		config.product = 'SmartProxy';
 		config.version = null;
 		if (config['activeProfileId'] == null) {
-			config.activeProfileId = SmartProfileTypeBuiltinIds.Direct;
+			config.activeProfileId = SmartProfileTypeBuiltinIds.SmartRules;
 		}
 		if (config['defaultProxyServerId'] == null) {
+			// We'll switch the proxy when we fetch the proxy list.
 			config.defaultProxyServerId = getOurRandomProxyServer().id;
 		}
 		if (config['options'] == null) {
@@ -182,12 +182,20 @@ export class Settings {
 			config.proxyServers = [];
 		}
 		if (config['proxyProfiles'] == null || !Array.isArray(config.proxyProfiles)) {
+			// We modified `getBuiltinSmartProfiles()`
 			config.proxyProfiles = getBuiltinSmartProfiles();
 		}
 		else
 			config.proxyProfiles = me.setDefaultSettingsSmartProfiles(config.proxyProfiles);
 
-		if (config['proxyServerSubscriptions'] == null || !Array.isArray(config.proxyServerSubscriptions) || config.proxyServerSubscriptions.length === 0) {
+		if (
+			config['proxyServerSubscriptions'] == null ||
+			!Array.isArray(config.proxyServerSubscriptions) ||
+			// A migration from the previous version,
+			// where `proxyServerSubscriptions` is empty and `proxyServers`
+			// is used instead.
+			config.proxyServerSubscriptions.length === 0
+		) {
 			config.proxyServerSubscriptions = [makeOurProxySubscription()];
 		}
 

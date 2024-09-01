@@ -9,70 +9,27 @@
 	"icons": {
 		"16": "icons/speed-16x16.png",
 		"32": "icons/speed-32x32.png",
-		"128": "icons/speed-128x128.png",
-		"512": "icons/speed-512x512.png"
+		"128": "icons/speed-128x128.png"
 	},
 	"permissions": [
-		"activeTab",
-		"tabs",
 		"proxy",
 		"webRequest",
 		"webRequestAuthProvider",
-		"storage",
-		"unlimitedStorage",
-		"notifications"
+		"storage"
 	],
 	"host_permissions": [
-		"<all_urls>"
+		"https://www.youtube.com/"
 	],
 	"action": {
-		"browser_style": true,
-		"default_title": "__MSG_extensionName__",
 		"default_popup": "ui-new/popup/index.html",
 		"default_icon": {
-			"16": "icons/smartproxy-16.png",
-			"24": "icons/smartproxy-24.png",
-			"48": "icons/smartproxy-48.png",
-			"96": "icons/smartproxy-96.png",
-			"128": "icons/smartproxy-128.png"
+			"16": "icons/speed-16x16.png",
+			"32": "icons/speed-32x32.png",
+			"128": "icons/speed-128x128.png"
 		}
 	},
 	"background": {
 		"service_worker": "core.js"
-	},
-	"options_ui": {
-		"page": "ui/settings.html",
-		"open_in_tab": true
-	},
-	"commands": {
-		"next-proxy-server": {
-			"suggested_key": { 
-				"default": "Ctrl+Shift+Period",
-				"mac": "Command+Shift+Period"
-			},
-			"description": "Switch to next proxy server as the active proxy"
-		},
-		"proxy-mode-none": {
-			"suggested_key": {
-				"default": "Ctrl+Shift+1",
-				"mac": "Command+Shift+1"
-			},
-			"description": "Switch to 'No Proxy' mode"
-		},
-		"proxy-mode-smart": {
-			"suggested_key": {
-				"default": "Ctrl+Shift+2",
-				"mac": "Command+Shift+2"
-			},
-			"description": "Switch to 'Smart Proxy' mode"
-		},
-		"proxy-mode-always": {
-			"suggested_key": {
-				"default": "Ctrl+Shift+3",
-				"mac": "Command+Shift+0"
-			},
-			"description": "Switch to 'Always Enabled' mode"
-		}
 	},
 	"minimum_chrome_version": "100"
 }

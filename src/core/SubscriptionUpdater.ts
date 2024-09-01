@@ -168,7 +168,6 @@ export class SubscriptionUpdater {
 					const oldProxies = subscription.proxies;
 					subscription.proxies = response.result;
 					const newProxies = subscription.proxies;
-					
 					subscription.totalCount = count;
 
 					SubscriptionStats.updateStats(subscription.stats, true);
@@ -207,12 +206,12 @@ export class SubscriptionUpdater {
 						// Might as well esnure that the new settings are actually applied.
 						// An alternative approach is to have a callback to Core,
 						// something like `onServerSubscriptionRead`.
-
+	
 						// This updates storage and actually sets the proxy in the browser.
 						Debug.log("Proxy list changed. Switching proxy to", newProxy);
 						Core.ChangeActiveProxy(newProxy);
 					}
-					
+
 					SettingsOperation.saveProxyServerSubscriptions();
 					SettingsOperation.saveAllSync(false);
 
